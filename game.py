@@ -4,6 +4,7 @@ SCREEN_WIDTH = 600
 SCREEN_HEIGHT = 600
 
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen.fill((255, 255, 255))
 
 BASE_COLOR = (127, 127, 127)
 
@@ -12,26 +13,44 @@ def draw_grid(screen):
         pg.draw.line(screen, BASE_COLOR, (i * 200, 0), (i * 200, 600), 1)
         pg.draw.line(screen, BASE_COLOR, (0, i * 200), (600, i * 200), 1)
 
-CENTER_OF_TILES = [ (100, 100), (300, 100), (500, 100),
-                    (100, 300), (300, 300), (500, 300),
-                    (100, 500), (300, 500), (500, 500) ]
+class Point:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
 
-def draw_x(screen, x, y):
-    pg.draw.line(screen, BASE_COLOR, (x - 50, y - 50), (x + 50, y + 50), 1)
-    pg.draw.line(screen, BASE_COLOR, (x + 50, y - 50), (x - 50, y + 50), 1)
+def center_of_tile(index):
+    CENTER_OF_TILES = [
+        Point(100, 100), Point(300, 100), Point(500, 100),
+        Point(100, 300), Point(300, 300), Point(500, 300),
+        Point(100, 500), Point(300, 500), Point(500, 500)
+    ]
+
+    return CENTER_OF_TILES[index - 1]
+
+def draw_x(x, y):
+    x1, y1 = x - 50, y - 50
+    x2, y2 = x + 50, y + 50
+    pg.draw.line(screen, BASE_COLOR, (x1, y1), (x2, y2), 1)
+    pg.draw.line(screen, BASE_COLOR, (x2, y1), (x1, y2), 1)
+
+def draw_x_to_tile(index):
+    center = center_of_tile(index)
+    draw_x(center.x, center.y)
 
 def draw_o(screen, x, y):
     pg.draw.circle(screen, BASE_COLOR, (x, y), 50, 1)
 
-def get_tile(x, y):
-    if x < 0 or x > 600 or y < 0 or y > 600:
+def get_tile(point):
+    pt = Point(point[0], point[1])
+
+    if pt.x < 0 or pt.x > 600 or pt.y < 0 or pt.y > 600:
         return -1
 
-    for i in range(9):
-        if ( x > CENTER_OF_TILES[i][0] - 100 
-            and x < CENTER_OF_TILES[i][0] + 100 
-            and y > CENTER_OF_TILES[i][1] - 100 
-            and y < CENTER_OF_TILES[i][1] + 100
+    for i in range(1, 10):
+        if (    pt.x > center_of_tile(i).x - 100 
+            and pt.x < center_of_tile(i).x + 100 
+            and pt.y > center_of_tile(i).y - 100 
+            and pt.y < center_of_tile(i).y + 100
         ):
             return i
     return -1
@@ -45,21 +64,17 @@ def main():
     
     while running:
         for e in pg.event.get():
-            #print(e)
             if e.type == pg.QUIT:
                 running = False
+            
+            if e.type == pg.MOUSEBUTTONUP:
+                tile_index = get_tile(e.pos)
+                if tile_index != -1:
+                    draw_x_to_tile(tile_index)
 
-        screen.fill((255, 255, 255))
-        draw_grid(screen)
-
-        for i in range(9):
-            draw_x(screen, CENTER_OF_TILES[i][0], CENTER_OF_TILES[i][1])
+            pg.display.update()
         
-        # üzerine gelme eventi varsa çalışır
-        if e.type == pg.MOUSEMOTION:
-            print(get_tile(e.pos[0], e.pos[1]), end =" ")
-
-        pg.display.flip()
+        draw_grid(screen)
 
     pg.quit()
 
