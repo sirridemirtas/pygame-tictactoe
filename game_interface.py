@@ -38,6 +38,10 @@ class GameInterface:
     def draw_x_to_tile(self, index):
         center = self.center_of_tile(index)
         self.__draw_x(center.x, center.y)
+    
+    def draw_o_to_tile(self, index):
+        center = self.center_of_tile(index)
+        self.__draw_o(center.x, center.y)
 
     def get_tile(self, point):
         pt = Point(point[0], point[1])
@@ -53,3 +57,8 @@ class GameInterface:
             ):
                 return i
         return -1
+
+    def reset(self):
+        self.screen.fill((255, 255, 255))
+        self.draw_grid()
+        pg.display.update()

@@ -6,9 +6,12 @@ class GameState:
             0, 0, 0,
             0, 0, 0
         ]
+    
+    def is_empty(self, tile):
+        return self.game_state[tile] == 0
 
     def check(self):
-        # return => 0: No winner, 1: X, 2: O
+        # return => 0: No winner, 1: X, 2: O, 3: Draw
         win_states = [
             # game_state indexes
             (0, 1, 2), (3, 4, 5), (6, 7, 8,),
@@ -19,9 +22,12 @@ class GameState:
         for state in win_states:
             if (   self.game_state[state[0]]
                 == self.game_state[state[1]]
-                == self.game_state[state[2]]
-            ):
+                == self.game_state[state[2]] ):
                 return self.game_state[state[0]]
+        # draw
+        if 0 not in self.game_state:
+            return 3
+
         return 0
     
     def update(self, tile, value):
